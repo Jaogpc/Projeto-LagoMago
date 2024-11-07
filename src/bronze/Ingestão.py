@@ -2,6 +2,7 @@
 # DBTITLE 1,Imports
 import os
 import delta
+from pyspark.sql.functions import col
 
 # COMMAND ----------
 
@@ -80,6 +81,30 @@ bronze
 # DBTITLE 1,Visualização pós merge
 # MAGIC %sql
 # MAGIC SELECT * FROM bronze.titanic
+
+# COMMAND ----------
+
+# DBTITLE 1,Contagem de tabelas
+def table_exists(database, table):
+    tables_df = spark.sql(f"SHOW TABLES IN {database}")
+    count = tables_df.filter((col("database") == database) & (col("tableName") == table)).count()
+    return count == 1
+
+
+
+# COMMAND ----------
+
+# DBTITLE 1,Função de criação de tabela
+if not table_exists("bronze", "titanic"):
+    df = spark.read.format("csv").load("/mnt/project/")
+    (df.coalesce(1)
+       .write
+       .format("delta")
+       .mode("overwrite")
+       .saveAsTable("bronze.titanic"))
+    
+else:
+    print("Tabela já existente, ignorando Full Load")
 
 # COMMAND ----------
 
