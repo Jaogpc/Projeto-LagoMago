@@ -25,7 +25,8 @@ path = "/mnt/project/"
 # COMMAND ----------
 
 # DBTITLE 1,Construção do mount
-dbutils.fs.mount(source=src_url, mount_point=mount_name, extra_configs={conf_key:account_key})
+#mount já criado
+#dbutils.fs.mount(source=src_url, mount_point=mount_name, extra_configs={conf_key:account_key})
 
 # COMMAND ----------
 
@@ -58,16 +59,16 @@ df.show()
 # DBTITLE 1,Stream
 #não executável
 
-df_stream = (spark.readStream
-                .format("cloudFiles")
-                .option("cloudFiles.format", "csv")
-                .option("cloudFiles.schemaLocation", "/mnt/project/titanic/schema")
-                .option("cloudFiles.inferColumnTypes", "true")
-                .load("/mnt/project"))
-
-stream = (df_stream.writeStream
-          .option("checkpointLocation", "/mnt/project/titanic_checkpoint")
-          .foreachBatch(lambda df, batchID: upsert(df, bronze)))
+#df_stream = (spark.readStream
+                #.format("cloudFiles")
+                #.option("cloudFiles.format", "csv")
+                #.option("cloudFiles.schemaLocation", "/mnt/project/titanic/schema")
+                #.option("cloudFiles.inferColumnTypes", "true")
+                #.load("/mnt/project"))
+#
+#stream = (df_stream.writeStream
+          #.option("checkpointLocation", "/mnt/project/titanic_checkpoint")
+          #.foreachBatch(lambda df, batchID: upsert(df, bronze)))
 
 
 # COMMAND ----------
@@ -75,7 +76,7 @@ stream = (df_stream.writeStream
 # DBTITLE 1,Inicialização do stream
 #não irá executar por usar uma base estática
 
-start = stream.start()
+#start = stream.start()
 
 # COMMAND ----------
 
