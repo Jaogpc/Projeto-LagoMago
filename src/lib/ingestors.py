@@ -3,9 +3,9 @@ import utils
 
 class Ingestor:
 
-    def __init__(self, mount_name, schema, tablename, data_format):
+    def __init__(self, catalog, schema, tablename, data_format):
         
-        self.catalog = mount_name
+        self.catalog = catalog
         self.schemaname = schema
         self.tablename = tablename
         self.format = data_format
