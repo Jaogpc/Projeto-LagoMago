@@ -21,6 +21,9 @@ conf_key=f"fs.azure.account.key.{account_name}.blob.core.windows.net"
 mount_name=f"/mnt/project/"
 tablename = "bronze.titanic"
 path = "/mnt/project/"
+schema = "bronze"
+catalog = "hive_metastore"
+
 
 # COMMAND ----------
 
@@ -31,18 +34,20 @@ path = "/mnt/project/"
 # COMMAND ----------
 
 # DBTITLE 1,Leitura do arquivo
-df = spark.read.format("csv").load(path)
+df = spark.read.format("csv").option("header", "true").load(path)
 (df.coalesce(1)
             .write
             .format("delta")
             .mode("overwrite")
             .saveAsTable(tablename))
 
+
+
 # COMMAND ----------
 
 # DBTITLE 1,Variável que guarda o schema
-schema = df.schema
-schema.json()
+#schema = df.schema
+#schema.json()
 
 # COMMAND ----------
 
@@ -98,22 +103,22 @@ else:
 # COMMAND ----------
 
 # DBTITLE 1,Upsert
-
 query = ''' 
             SELECT * FROM bronze.titanic
         '''
-
 df_unique = spark.sql(query)
 
-bronze = delta.DeltaTable.forName(spark, tablename)
+bronze = delta.DeltaTable.forName(spark, "bronze.titanic")
 
 (bronze.alias("b")
-    .merge(df_unique.alias("d"),
-    "b._c0 = d._c0")
-    .whenMatchedDelete(condition = "d._c27 = '1'")
-    .whenMatchedUpdateAll(condition = "d._c27 ='0'")
-    .whenNotMatchedInsertAll(condition = "d._c27 = '2'")
-.execute()
+    .merge(
+        df_unique.alias("d"),
+        "b.Passengerid = d.Passengerid"
+    )
+    .whenMatchedDelete(condition="d.2urvived = '1'")
+    .whenMatchedUpdateAll(condition="d.2urvived = '0'")
+    .whenNotMatchedInsertAll(condition="d.2urvived = '2'")
+    .execute()
 )
 
 # COMMAND ----------
@@ -121,7 +126,3 @@ bronze = delta.DeltaTable.forName(spark, tablename)
 # DBTITLE 1,Visualização da tabela
 # MAGIC %sql
 # MAGIC SELECT * FROM bronze.titanic
-
-# COMMAND ----------
-
-
