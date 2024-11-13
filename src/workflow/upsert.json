@@ -1,39 +1,59 @@
 {
-    "job_id": 226937458769248,
-    "new_settings": {
-      "name": "Upsert",
-      "email_notifications": {
-        "no_alert_for_skipped_runs": false
-      },
-      "webhook_notifications": {},
-      "timeout_seconds": 0,
-      "max_concurrent_runs": 1,
-      "tasks": [
-        {
-          "task_key": "bronze_titanic",
-          "run_if": "ALL_SUCCESS",
-          "notebook_task": {
-            "notebook_path": "src/bronze/ingestão",
-            "base_parameters": {
-              "tablename": "titanic"
-            },
-            "source": "GIT"
+  "job_id": 226937458769248,
+  "new_settings": {
+    "name": "Upsert",
+    "email_notifications": {
+      "no_alert_for_skipped_runs": false
+    },
+    "webhook_notifications": {},
+    "timeout_seconds": 0,
+    "max_concurrent_runs": 1,
+    "tasks": [
+      {
+        "task_key": "bronze_titanic",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "src/bronze/ingestão",
+          "base_parameters": {
+            "tablename": "titanic"
           },
-          "existing_cluster_id": "1105-224159-gfckjvd3",
-          "timeout_seconds": 0,
-          "email_notifications": {}
-        }
-      ],
-      "git_source": {
-        "git_url": "https://github.com/Jaogpc/Projeto-LagoMago",
-        "git_provider": "gitHub",
-        "git_branch": "bronze"
+          "source": "GIT"
+        },
+        "existing_cluster_id": "1105-224159-gfckjvd3",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
       },
-      "queue": {
-        "enabled": true
-      },
-      "run_as": {
-        "user_name": "joao.costa82@fatec.sp.gov.br"
+      {
+        "task_key": "silver_passageiro",
+        "depends_on": [
+          {
+            "task_key": "bronze_titanic"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "src/silver/ingestao",
+          "base_parameters": {
+            "tablename": "passageiro"
+          },
+          "source": "GIT"
+        },
+        "existing_cluster_id": "1105-224159-gfckjvd3",
+        "timeout_seconds": 0,
+        "email_notifications": {}
       }
+    ],
+    "git_source": {
+      "git_url": "https://github.com/Jaogpc/Projeto-LagoMago",
+      "git_provider": "gitHub",
+      "git_branch": "main"
+    },
+    "queue": {
+      "enabled": true
+    },
+    "run_as": {
+      "user_name": "joao.costa82@fatec.sp.gov.br"
     }
   }
+}
