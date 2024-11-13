@@ -97,6 +97,7 @@ if not utils.table_exists(spark, "bronze", "titanic"):
                       tablename = tablename, 
                       data_format= "csv")
     
+    ingest.set_schema(schema)
     ingest.execute(path)
     
 else:
