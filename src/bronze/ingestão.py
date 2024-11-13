@@ -133,9 +133,4 @@ bronze = delta.DeltaTable.forName(spark, "bronze.titanic")
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC DROP TABLE titanic
-
-# COMMAND ----------
-
 
