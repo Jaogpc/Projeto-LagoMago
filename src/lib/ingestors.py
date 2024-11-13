@@ -6,7 +6,7 @@ class Ingestor:
     def __init__(self, catalog, schema, tablename, data_format):
         
         self.catalog = catalog
-        self.schemaname = schema
+        self.schema = schema
         self.tablename = tablename
         self.format = data_format
         self.set_schema()
@@ -26,7 +26,7 @@ class Ingestor:
             .write
             .format("delta")
             .mode("overwrite")
-            .saveAsTable(self.tablename))
+            .saveAsTable(f"{self.catalog}.{self.schemaname}.{self.tablename}"))
         
     def execute(self, path):
         df = self.load(self.catalog)

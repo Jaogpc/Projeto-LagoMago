@@ -1,14 +1,20 @@
 # Databricks notebook source
 # DBTITLE 1,Imports
+import sys
+sys.path.insert(0, "../lib/")
+import utils
+import ingestors
 import os
 import delta
 
-import sys
+# COMMAND ----------
 
-sys.path.insert(0, "../lib/")
-
-import utils
-import ingestors
+# catalog = dbutils.widgets.get("catalog")
+catalog = "hive_metastore"
+# schema = dbutils.widgets.get("schema")
+schema = "bronze"
+# tablename = dbutils.widgets.get("tablename")
+tablename = "titanic"
 
 # COMMAND ----------
 
@@ -19,10 +25,7 @@ container_name="raw"
 src_url=f"wasbs://{container_name}@{account_name}.blob.core.windows.net"
 conf_key=f"fs.azure.account.key.{account_name}.blob.core.windows.net"
 mount_name=f"/mnt/project/"
-tablename = "bronze.titanic"
 path = "/mnt/project/"
-schema = "bronze"
-catalog = "hive_metastore"
 
 
 # COMMAND ----------
@@ -39,7 +42,7 @@ df = spark.read.format("csv").option("header", "true").load(path)
             .write
             .format("delta")
             .mode("overwrite")
-            .saveAsTable(tablename))
+            .saveAsTable(f"{schema}.{tablename}"))
 
 
 
@@ -89,8 +92,8 @@ df.show()
 if not utils.table_exists(spark, "bronze", "titanic"):
     print("Tabela sendo criada!")
 
-    ingest = ingestors.Ingestor(catalog = mount_name, 
-                      shemaname = schema, 
+    ingest = ingestors.Ingestor(catalog = catalog, 
+                      schema = schema, 
                       tablename = tablename, 
                       data_format= "csv")
     
@@ -126,3 +129,12 @@ bronze = delta.DeltaTable.forName(spark, "bronze.titanic")
 # DBTITLE 1,Visualização da tabela
 # MAGIC %sql
 # MAGIC SELECT * FROM bronze.titanic
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC DROP TABLE titanic
+
+# COMMAND ----------
+
+
